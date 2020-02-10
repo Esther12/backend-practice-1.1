@@ -1,21 +1,16 @@
 const db = require("../models");
 // get the existing data
-const fs = require("fs");
-let statsData = fs.readFileSync("../fixtures/stats.collection.json");
-let stats = JSON.parse(statsData);
-console.log(stats);
+// const fs = require("fs");
+// let statsData = fs.readFileSync("fixtures/stats.collection.json");
+// let stats = JSON.parse(statsData);
+// console.log(stats);
 
 // Defining methods for the booksController
 
 module.exports = {
-  getall: (req, res) => {
-    db.Stats.insertMany(stats)
-      .then(dbModel => res.json(dbModel))
-      .catch(err => res.status(404).json(err));
-  },
   findAll: (req, res) => {
     db.Stats.find(req.query)
-      .sort({ date: -1 })
+      .sort({ created_at: -1 })
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(404).json(err));
   },
@@ -24,7 +19,8 @@ module.exports = {
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(404).json(err));
   },
-  create: function(req, res) {
+  create: (req, res) => {
+    console.log("Get in here");
     db.Stats.create(req.body)
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(404).json(err));
