@@ -1,0 +1,24 @@
+{
+  "name": "recruiting-test-2019_q4_be",
+  "version": "1.0.0",
+  "description": "## Summary",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/YatingSu/first-try-out.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/YatingSu/first-try-out/issues"
+  },
+  "homepage": "https://gitlab.com/YatingSu/first-try-out#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.8.11",
+    "nodemon": "^2.0.2"
+  }
+}
