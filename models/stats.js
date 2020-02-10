@@ -10,7 +10,7 @@ const statsSchema = new Schema({
   value: { type: String },
   date: { type: Date },
   created_at: { type: Date },
-  updated_at: { type: Date }
+  updated_at: { type: Date, default: Date.now }
 });
 
 const Stats = mongoose.model("Stats", statsSchema);

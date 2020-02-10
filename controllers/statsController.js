@@ -31,6 +31,8 @@ module.exports = {
       .catch(err => res.status(404).json(err));
   },
   update: (req, res) => {
+    let data = req.body.push({ updated_at: Date.now() });
+    console.log(data);
     db.Stats.findOneAndUpdate({ _id: req.params.id }, req.body)
       .then(dbModel => res.json(dbModel))
       .catch(err => res.status(404).json(err));
