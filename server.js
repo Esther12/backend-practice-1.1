@@ -21,23 +21,12 @@ mongoose
   .then(() => console.log("MongoDB connection successful!"))
   .catch(err => console.error(err));
 
-router.route("post").post(statsController.create);
-app.post("/submit", function(req, res) {
+app.post("/collection/stats", function(req, res) {
   // Create a new Note in the db
   db.Stats.create(req.body)
-    .then(function(dbNote) {
-      // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
-      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-      return db.User.findOneAndUpdate(
-        {},
-        { $push: { notes: dbNote._id } },
-        { new: true }
-      );
-    })
-    .then(function(dbUser) {
+    .then(function(dbModel) {
       // If the User was updated successfully, send it back to the client
-      res.json(dbUser);
+      res.json(dbModel);
     })
     .catch(function(err) {
       // If an error occurs, send it back to the client
@@ -46,17 +35,35 @@ app.post("/submit", function(req, res) {
 });
 
 // Route for retrieving all Users from the db
-app.get("/all", function(req, res) {
+app.get("/collection/stats", function(req, res) {
   // Find all Users
   db.Stats.find({})
-    .then(function(dbUser) {
+    .then(function(dbModel) {
       // If all Users are successfully found, send them back to the client
-      res.json(dbUser);
+      res.json(dbModel);
     })
     .catch(function(err) {
       // If an error occurs, send the error back to the client
       res.json(err);
     });
+});
+
+app.get("/collection/stats/:id", function(req, res) {
+  db.Stats.findById(req.params.id)
+    .then(dbModel => res.json(dbModel))
+    .catch(err => res.status(404).json(err));
+});
+
+app.put("/collection/stats/:id", (req, res) => {
+  db.Stats.findOneAndUpdate({ _id: req.params.id }, req.body)
+    .then(dbModel => res.json(dbModel))
+    .catch(err => res.status(404).json(err));
+});
+
+app.delete("/collection/stats/:id", (req, res) => {
+  db.Stats.findByIdAndRemove(req.params.id)
+    .then(dbModel => res.json(dbModel))
+    .catch(err => res.status(404).json(err));
 });
 
 // Start the server
