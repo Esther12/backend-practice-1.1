@@ -1,8 +1,6 @@
 var mongoose = require("mongoose");
 var express = require("express");
 const app = express();
-const router = require("express").Router();
-const statsController = require("./controllers/statsController");
 const db = require("./models");
 var PORT = process.env.PORT || 4000;
 
@@ -33,7 +31,7 @@ app.post("/collection/stats", (req, res) => {
 app.get("/collection/stats", function(req, res) {
   // Find all Stats
   db.Stats.find({})
-    .sort({ created_at: -1, updated_at: -1 })
+    .sort({ created_at: -1, updated_at: -1 }) // sort by the create data primary and updated date secondery
     .then(function(dbModel) {
       // If all Users are successfully found, send them back to the client
       res.json(dbModel);
@@ -52,7 +50,7 @@ app.get("/collection/stats/:id", function(req, res) {
 
 app.put("/collection/stats/:id", (req, res) => {
   let data = req.body;
-  data = { ...data, updated_at: Date().toString() };
+  data = { ...data, updated_at: Date().toString() }; // acync the updated date
   console.log(data);
   db.Stats.findOneAndUpdate({ _id: req.params.id }, data)
     .then(dbModel => res.json(dbModel))
@@ -63,6 +61,59 @@ app.delete("/collection/stats/:id", (req, res) => {
   db.Stats.findByIdAndRemove(req.params.id)
     .then(dbModel => res.json(dbModel)) // If one Stats are successfully delete, send them back to the client
     .catch(err => res.status(404).json(err)); // If an error occurs, send the error back to the client
+});
+
+app.get("/report/recent_stats_by_channel", (req, res) => {
+  db.Stats.aggregate([
+    { $unwind: "$stat" },
+    { $sort: { updated_at: -1 } },
+    {
+      $project: {
+        asset_id: 1,
+        value: 1,
+        updated_at: 1,
+        stat: 1
+      }
+    },
+    {
+      subscribers: [
+        {
+          $match: { stat: "subscribers" }
+        },
+        {
+          $group: {
+            _id: "$asset_id",
+            sub: {
+              $push: {
+                value: "$value",
+                date: "$updated_at"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]).exec(function(err, found) {
+    // Log any errors if the server encounters one
+    if (err) {
+      console.log(err);
+    }
+    // Otherwise, send the result of this query to the browser
+    else {
+      res.json(found);
+    }
+  });
+});
+
+app.get("/utils/contact_me", (req, res) => {
+  db.Contect.find({})
+    .then(dbModel => res.json(dbModel))
+    .catch(err => res.status(404).json(err));
+});
+app.post("/utils/contact", (req, res) => {
+  db.Contect.create(req.body)
+    .then(dbModel => res.json(dbModel))
+    .catch(err => res.status(404).json(err));
 });
 
 // Start the server
